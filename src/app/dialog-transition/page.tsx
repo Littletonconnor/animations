@@ -1,29 +1,20 @@
 "use client";
 
 import * as RadixDialog from "@radix-ui/react-dialog";
-import { useEffect, useState, useRef } from "react";
-import { useOnClickOutside } from "usehooks-ts";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 export default function SharedLayout() {
   const [activeGame, setActiveGame] = useState<(typeof GAMES)[0] | null>();
-  const ref = useRef(null);
-  useOnClickOutside(ref, () => setActiveGame(null));
-
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setActiveGame(null);
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  const isOpen = Boolean(activeGame);
 
   return (
     <div className="py-12">
-      <RadixDialog.Root open={Boolean(activeGame)}>
+      <RadixDialog.Root
+        open={isOpen}
+        onOpenChange={() => isOpen && setActiveGame(null)}
+      >
         <div className="min-h-screen">
           <AnimatePresence>
             <RadixDialog.Portal>
@@ -32,7 +23,6 @@ export default function SharedLayout() {
                 <motion.div
                   layoutId={`game-wrapper-${activeGame?.title}`}
                   className="flex h-fit w-[500px] cursor-pointer flex-col items-start gap-4 overflow-hidden bg-white p-4"
-                  ref={ref}
                   style={{ borderRadius: 12 }}
                 >
                   <div className="flex w-full items-center gap-4">
@@ -59,12 +49,14 @@ export default function SharedLayout() {
                           {activeGame?.description}
                         </motion.p>
                       </div>
-                      <motion.button
-                        layoutId={`game-button-${activeGame?.title}`}
-                        className="rounded-full bg-gray-300 py-1 px-3 font-semibold text-blue-500"
-                      >
-                        Get
-                      </motion.button>
+                      <RadixDialog.Close aria-label="Close">
+                        <motion.button
+                          layoutId={`game-button-${activeGame?.title}`}
+                          className="rounded-full bg-gray-300 py-1 px-3 font-semibold text-blue-500"
+                        >
+                          Get
+                        </motion.button>
+                      </RadixDialog.Close>
                     </div>
                   </div>
                   <motion.p
