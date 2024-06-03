@@ -1,13 +1,24 @@
 "use client";
 
 import * as RadixDialog from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
 export default function SharedLayout() {
   const [activeGame, setActiveGame] = useState<(typeof GAMES)[0] | null>();
   const isOpen = Boolean(activeGame);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setActiveGame(null);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   return (
     <div className="py-12">
